@@ -1,4 +1,4 @@
-name: dpvo
+name: dpvo-inference
 channels:
   - pyg
   - pytorch
@@ -24,3 +24,4 @@ dependencies:
     - evo
     - opencv-python
     - yacs
+    - decord
