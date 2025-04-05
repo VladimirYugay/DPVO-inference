@@ -137,12 +137,24 @@ def main():
         pred_poses = load_tum_trajectory(predictions_path / scene_name / "pred_traj.npy")
         gt_poses = np.load(predictions_path / scene_name / "gt_traj.npy")
 
+        if (output_path / scene_name / "metrics.json").is_file():
+            print("Skpping", scene_name)
+            continue
+
         # Evaluate every stride frame to match the eval protocol of Cut3r and VGGT
         pred_poses = pred_poses[::args.eval_stride]
         gt_poses = gt_poses[::args.eval_stride]
 
+        if pred_poses.shape[0] < 2:
+            continue
+
         metrics, traj_img = eval_trajectory(pred_poses, gt_poses, np.arange(len(pred_poses)), align=False)
-        aligned_metrics, _ = eval_trajectory(pred_poses, gt_poses, np.arange(len(pred_poses)), align=True)
+        
+        try:
+            aligned_metrics, _ = eval_trajectory(pred_poses, gt_poses, np.arange(len(pred_poses)), align=True)
+        except:
+            print("Umeyama failed")
+            continue
 
         all_metrics = deepcopy(metrics)
         for key in aligned_metrics:

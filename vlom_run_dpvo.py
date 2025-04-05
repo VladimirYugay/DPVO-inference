@@ -74,7 +74,8 @@ def arkit_image_stream(queue, imagedir):
 
     for i in range(c2ws.shape[0]):
         image = vr[i].asnumpy()
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = image.transpose(2, 0, 1)
         intrinsics = all_intrinsics[i]
         fx, fy, cx, cy = intrinsics[0, 0], intrinsics[1, 1], intrinsics[0, 2], intrinsics[1, 2]
         intrinsics = np.array([fx, fy, cx, cy])
@@ -88,7 +89,10 @@ def run(cfg, network, scene_dir):
     slam = None
 
     queue = Queue(maxsize=8)
-    reader = Process(target=scannet_image_stream, args=(queue, scene_dir))
+    if "ScanNet" in str(scene_dir):
+        reader = Process(target=scannet_image_stream, args=(queue, scene_dir))
+    else:
+        reader = Process(target=arkit_image_stream, args=(queue, scene_dir))
     reader.start()
 
     gt_poses = []
