@@ -137,9 +137,6 @@ def main():
         pred_poses = load_tum_trajectory(predictions_path / scene_name / "pred_traj.npy")
         gt_poses = np.load(predictions_path / scene_name / "gt_traj.npy")
 
-        print(pred_poses.shape)
-        print(gt_poses.shape)
-
         # Evaluate every stride frame to match the eval protocol of Cut3r and VGGT
         pred_poses = pred_poses[::args.eval_stride]
         gt_poses = gt_poses[::args.eval_stride]
