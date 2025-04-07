@@ -17,7 +17,7 @@ from PIL import Image
 from scipy.spatial.transform import Rotation
 
 
-def eval_trajectory(poses_est, poses_gt, frame_ids, align=False):
+def eval_trajectory(poses_est, poses_gt, frame_ids, align=False, delta=1):
 
     traj_ref = PoseTrajectory3D(
         positions_xyz=poses_gt[:, :3, 3],
@@ -54,7 +54,7 @@ def eval_trajectory(poses_est, poses_gt, frame_ids, align=False):
         pose_relation=PoseRelation.rotation_angle_deg,
         align=align,
         correct_scale=align,
-        delta=1,
+        delta=delta,
         delta_unit=Unit.frames,
         rel_delta_tol=0.01,
         all_pairs=True)
@@ -67,7 +67,7 @@ def eval_trajectory(poses_est, poses_gt, frame_ids, align=False):
         pose_relation=PoseRelation.translation_part,
         align=align,
         correct_scale=align,
-        delta=1,
+        delta=delta,
         delta_unit=Unit.frames,
         rel_delta_tol=0.01,
         all_pairs=True)
@@ -141,17 +141,14 @@ def main():
             print("Skpping", scene_name)
             continue
 
-        # Evaluate every stride frame to match the eval protocol of Cut3r and VGGT
-        pred_poses = pred_poses[::args.eval_stride]
-        gt_poses = gt_poses[::args.eval_stride]
-
         if pred_poses.shape[0] < 2:
             continue
-
-        metrics, traj_img = eval_trajectory(pred_poses, gt_poses, np.arange(len(pred_poses)), align=False)
         
         try:
-            aligned_metrics, _ = eval_trajectory(pred_poses, gt_poses, np.arange(len(pred_poses)), align=True)
+            metrics, traj_img = eval_trajectory(pred_poses, gt_poses, np.arange(len(pred_poses)),
+                                                align=False, delta=args.eval_stride)            
+            aligned_metrics, _ = eval_trajectory(pred_poses, gt_poses, np.arange(len(pred_poses)),
+                                                 align=True, delta=args.eval_stride)
         except:
             print("Umeyama failed")
             continue
