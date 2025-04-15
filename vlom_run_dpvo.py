@@ -204,7 +204,7 @@ if __name__ == '__main__':
     print("\nRunning with config...")
     print(cfg, "\n")
 
-    torch.manual_seed(1)
+    torch.manual_seed(2)
 
     # Load scene names from the split file
     with open(args.split_file, 'r') as f:
